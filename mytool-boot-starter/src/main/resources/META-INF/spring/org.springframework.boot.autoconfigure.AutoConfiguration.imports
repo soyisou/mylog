@@ -1,0 +1,5 @@
+com.acjava.mytool.autoconfigure.MyAsyncAutoConfig
+com.acjava.mytool.autoconfigure.MyLogAutoConfig
+com.acjava.mytool.autoconfigure.TraceAutoConfig
+com.acjava.mytool.autoconfigure.SpringUtilAutoConfig
+com.acjava.mytool.autoconfigure.TraceRabbitAutoConfig

@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+
+    <!--  暂时注销掉，否则报错  -->
+<!--    <property resource="bootstrap.yml" />-->
+
+    <!--读取NaCos公共配置 application-${ENV}.yml -->
+<!--    <property resource="application-${ENV}.yml" />&ndash;&gt;-->
+    <!-- 日志存放路径 -->
+    <!--<springProperty scope="context" name="LOG_PATH" source="log.path" defaultValue="/var/acjava/logs"/>-->
+    <springProperty scope="context" name="LOG_PATH" source="log.path" defaultValue="./logs"/>
+
+    <!--读取bootstrap。yml配置-->
+    <!-- 环境配置 -->
+    <springProperty scope="context" name="ENV" source="spring.profiles.active" defaultValue="env-unKnow"/>
+    <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="app-unKnow"/>
+
+    <!-- 日志输出格式 -->
+    <property name="LOG_PATTERN" value="[%d{yyyy-MM-dd HH:mm:ss.SSS}] [${APP_NAME}] [%thread] [${ENV}] [%level] [%X{traceId}, %X{spanId}] [%X{ip}] [%X{userId}] [%file:%line] [%logger{50}] %msg%n"/>
+
+    <!-- 控制台输出 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- 系统日志输出 -->
+    <appender name="file_info" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${APP_NAME}.info.log</file>
+        <!-- 循环政策：基于时间创建日志文件 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- 日志文件名格式 -->
+            <fileNamePattern>${LOG_PATH}/${APP_NAME}.%d{yyyy-MM-dd}.%i.info.log.gz</fileNamePattern>
+            <!-- 日志最大的历史 -->
+            <maxHistory>3</maxHistory>
+            <!--日志文件最大的大小-->
+            <MaxFileSize>500MB</MaxFileSize>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <!--接受INFO及以上日志（即INFO, WARN, ERROR-->
+            <level>INFO</level>
+        </filter>
+    </appender>
+    <!--配置异步打印日志-->
+    <appender name="ASYNC_FILE_INFO" class="ch.qos.logback.classic.AsyncAppender">
+        <discardingThreshold>0</discardingThreshold>
+        <queueSize>1024</queueSize>
+        <neverBlock>true</neverBlock>
+        <appender-ref ref="file_info"/>
+        <includeCallerData>true</includeCallerData>
+    </appender>
+
+
+    <appender name="file_error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${APP_NAME}.error.log</file>
+        <!-- 循环政策：基于时间创建日志文件 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- 日志文件名格式 -->
+            <fileNamePattern>${LOG_PATH}/${APP_NAME}.%d{yyyy-MM-dd}.%i.error.log.gz</fileNamePattern>
+            <!-- 日志最大的历史 -->
+            <maxHistory>3</maxHistory>
+            <!--日志文件最大的大小-->
+            <MaxFileSize>500MB</MaxFileSize>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <!-- 过滤的级别 -->
+            <level>ERROR</level>
+            <!-- 匹配时的操作：接收（记录） -->
+            <onMatch>ACCEPT</onMatch>
+            <!-- 不匹配时的操作：拒绝（不记录） -->
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+    <!--配置异步打印日志-->
+    <appender name="ASYNC_FILE_ERROR" class="ch.qos.logback.classic.AsyncAppender">
+        <discardingThreshold>0</discardingThreshold>
+        <queueSize>1024</queueSize>
+        <neverBlock>true</neverBlock>
+        <appender-ref ref="file_error"/>
+        <includeCallerData>true</includeCallerData>
+    </appender>
+
+
+    <!-- @MyLog 日志文件输出 -->
+    <appender name="MY_LOG_BASE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${APP_NAME}.my.log</file>
+        <!--只输出INFO-->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!--日志文件输出的文件名-->
+            <fileNamePattern>${LOG_PATH}/${APP_NAME}.%d{yyyy-MM-dd}.%i.my.log.gz</fileNamePattern>
+            <!-- 服务器保存日志最大的历史 -->
+            <maxHistory>3</maxHistory>
+            <!--日志文件最大的大小-->
+            <MaxFileSize>500MB</MaxFileSize>
+        </rollingPolicy>
+        <!--日志输出的文件的格式 -->
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->
+            <pattern>%msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!--配置异步打印日志-->
+    <appender name="ASYNC_MY_LOG" class="ch.qos.logback.classic.AsyncAppender">
+        <discardingThreshold>0</discardingThreshold>
+        <queueSize>1024</queueSize>
+        <neverBlock>true</neverBlock>
+        <appender-ref ref="MY_LOG_BASE"/>
+        <includeCallerData>true</includeCallerData>
+    </appender>
+
+    <!-- Spring日志级别控制  -->
+    <logger name="org.springframework" level="warn"/>
+    <logger name="springfox.documentation" level="error"/>
+    <logger name="com.alibaba" level="warn"/>
+    <logger name="org.mybatis" level="error"/>
+    <logger name="com.netflix" level="error"/>
+    <!--@MyLog指定输出，设置additivity=false，则禁止传递给父级日志记录器-->
+    <logger name="MY_LOG" level="INFO" additivity="false">
+        <appender-ref ref="ASYNC_MY_LOG"/>
+    </logger>
+
+    <!--开发环境，name值需要各自项目跟进实际情况进行修改-->
+    <springProfile name="dev">
+        <root level="info">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="ASYNC_FILE_INFO"/>
+            <appender-ref ref="ASYNC_FILE_ERROR"/>
+        </root>
+    </springProfile>
+
+    <!--测试环境，name值需要各自项目跟进实际情况进行修改 -->
+    <springProfile name="test">
+        <root level="info">
+            <appender-ref ref="ASYNC_FILE_INFO"/>
+            <appender-ref ref="ASYNC_FILE_ERROR"/>
+        </root>
+    </springProfile>
+
+    <!--uat环境，name值需要各自项目跟进实际情况进行修改 -->
+    <springProfile name="uat">
+        <root level="info">
+            <appender-ref ref="ASYNC_FILE_INFO" />
+            <appender-ref ref="ASYNC_FILE_ERROR"/>
+        </root>
+    </springProfile>
+
+    <!--线上环境，name值需要各自项目跟进实际情况进行修改 -->
+    <springProfile name="online">
+        <root level="info">
+            <appender-ref ref="ASYNC_FILE_INFO"/>
+            <appender-ref ref="ASYNC_FILE_ERROR"/>
+        </root>
+    </springProfile>
+
+    <!--线上环境，name值需要各自项目跟进实际情况进行修改 -->
+    <springProfile name="prd">
+        <root level="info">
+            <appender-ref ref="ASYNC_FILE_INFO"/>
+            <appender-ref ref="ASYNC_FILE_ERROR"/>
+        </root>
+    </springProfile>
+
+    <!--线上环境，name值需要各自项目跟进实际情况进行修改 -->
+    <springProfile name="prod">
+        <root level="info">
+            <appender-ref ref="ASYNC_FILE_INFO"/>
+            <appender-ref ref="ASYNC_FILE_ERROR"/>
+        </root>
+    </springProfile>
+</configuration>
