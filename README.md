@@ -43,8 +43,33 @@
 
 ## 4. 可配置参数
 
+### 4.1 .yml 配置文件
+```yaml
+mytool:
+  my-log:
+    enabled: true  # 是否使用 @MyLog 日志注解，默认值为 true
 
+  trace:
+    enabled: true  # 是否开启全链路追踪，默认值为 true
+    mq: # 是否开启 mq
+      rabbit:
+        enabled: false
+      rocket:
+        enabled: false
+
+  my-async:
+    enabled: true  # 是否使用 @MyAsync 异步注解，默认值为 true
+    default-pool:
+      corePoolSize: 8
+      maxPoolSize: 16
+      keepAliveSeconds: 180
+      queueCapacity: 500
+      awaitTerminationSeconds: 60
+      threadNamePrefix: mytool-default-pool-
 ```
+
+### 4.2 .properties配置文件
+```properties
 
 # 是否使用 @MyLog 日志注解，默认值为 true
 mytool.my-log.enabled=true
@@ -52,11 +77,15 @@ mytool.my-log.enabled=true
 # 是否开启全链路追踪，默认值为 true
 mytool.trace.enabled=true
 
+# 是否开启 RabbitMQ
+mytool.trace.mq.rabbit.enabled=false
+# 是否开启 RocketMQ
+mytool.trace.mq.rocket.enabled=false
+
 # 是否使用 @MyAsync 异步注解，默认值为 true
 mytool.my-async.enabled=true
 
 # 配置 @MyAsync 的线程池参数
-mytool.my-async.default-pool.cpuCore=4
 mytool.my-async.default-pool.corePoolSize=8
 mytool.my-async.default-pool.maxPoolSize=16
 mytool.my-async.default-pool.keepAliveSeconds=180
